@@ -1,60 +1,58 @@
-import { useEffect, useState } from "react";
 import "./App.css";
-import Recipe from "./Recipe";
+import Form from "./Form";
+import Todolist from "./Todolist";
+import {useEffect, useState} from "react"
+  function App() {
+    const [inputText, setInputText] = useState("")
+    const [todo, setTodo] = useState([])
+    const [status,setStatus] = useState("all")
+    const [filteredTodos,setFilteredTodos] = useState([])
+    // Run once the app start
+    useEffect(()=>{
+     getLocalTodos()
+     },[])
 
-function App() {
-  const APP_ID = "d395f2bd";
-  const APP_KEY = "5b5249818c641815903dc4aae03cccb3";
-  const [recipes, setRecipes] = useState([]);
-  const [search, setSearch] = useState();
-  const [query, setQuery] = useState("chicken");
-  useEffect(() => {
-    getRecipe();
-  }, [query]);
+    useEffect(()=>{
+      filterHandler()
+      saveLocalTodos()
+    },[todo,status])
+   const filterHandler = ()=>{
+    switch (status) {
+      case "completed":
+        setFilteredTodos(todo.filter(todo => todo.completed === true ))
+        break;
+    case "uncompleted":
+      setFilteredTodos(todo.filter(todo => todo.completed === false ))
+      break
+      default:  setFilteredTodos(todo)
+        break;
+    }
+   }
 
-  const getRecipe = async () => {
-    const response = await fetch(
-      `https://api.edamam.com/search?q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`
-    );
-    const data = await response.json();
-    setRecipes(data.hits);
-    console.log(data.hits);
-  };
-
-  const getSearch = (e) => {
-    e.preventDefault();
-    setQuery(search);
-    setSearch("");
-  };
-
-  // fetch(`https://api.edamam.com/search?q=chicken&app_id=${APP_ID}&app_key=${APP_KEY}`).then(response => response.json()).then(data => console.log(data))
-
-  return (
-    <div className="App">
-      <form onSubmit={getSearch} className="search-form">
-        <input
-          type="text"
-          className="search-bar"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button type="submit" className="submit-button">
-          Search
-        </button>
-      </form>
-      <div className="recipes">
-        {recipes.map((recipe) => (
-          <Recipe
-            key={recipe.recipe.label}
-            title={recipe.recipe.label}
-            calories={recipe.recipe.calories}
-            image={recipe.recipe.image}
-            ingredients={recipe.recipe.ingredients}
-          />
-        ))}
+   const saveLocalTodos = () =>{
+    if(todo.length>0){
+localStorage.setItem("todo",JSON.stringify(todo))
+    }
+    
+   }
+   const getLocalTodos = ()=>{
+    if (localStorage.getItem("todo") === null){
+      localStorage.setItem("todo",JSON.stringify([]));
+    } else {
+      let todoLocal = JSON.parse(localStorage.getItem("todo"))
+      setTodo(todoLocal)
+   }
+    }
+      
+    return (
+      <div className="App">
+        <header>
+          <h1>My Todo List</h1>
+        </header>
+        <Form todo={todo} setTodo={setTodo} inputText = {inputText} setInputText ={setInputText} setStatus={setStatus}/>
+        <Todolist todo={todo} setTodo={setTodo} inputText = {inputText} filteredTodos={filteredTodos}/>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
 export default App;
