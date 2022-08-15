@@ -1,58 +1,25 @@
-import "./App.css";
-import Form from "./Form";
-import Todolist from "./Todolist";
-import {useEffect, useState} from "react"
-  function App() {
-    const [inputText, setInputText] = useState("")
-    const [todo, setTodo] = useState([])
-    const [status,setStatus] = useState("all")
-    const [filteredTodos,setFilteredTodos] = useState([])
-    // Run once the app start
-    useEffect(()=>{
-     getLocalTodos()
-     },[])
+import { useState } from "react";
+import Search from "./Search";
 
-    useEffect(()=>{
-      filterHandler()
-      saveLocalTodos()
-    },[todo,status])
-   const filterHandler = ()=>{
-    switch (status) {
-      case "completed":
-        setFilteredTodos(todo.filter(todo => todo.completed === true ))
-        break;
-    case "uncompleted":
-      setFilteredTodos(todo.filter(todo => todo.completed === false ))
-      break
-      default:  setFilteredTodos(todo)
-        break;
-    }
-   }
-
-   const saveLocalTodos = () =>{
-    if(todo.length>0){
-localStorage.setItem("todo",JSON.stringify(todo))
-    }
+const App = () => {
+  const [movieTitle,setMovieTitle]= useState("")
+  const [movieInfo,setMovieInfo] = useState([])
+  let title = movieTitle
+  // if(movieTitle.split(" ").length > 1){
+  //   title = movieTitle.split(" ").join("&").replace("&"," ")
+  // }
+  if(movieTitle.includes("&")){
+    title = movieTitle.split(" ").join("&").replace("&"," ")
     
-   }
-   const getLocalTodos = ()=>{
-    if (localStorage.getItem("todo") === null){
-      localStorage.setItem("todo",JSON.stringify([]));
-    } else {
-      let todoLocal = JSON.parse(localStorage.getItem("todo"))
-      setTodo(todoLocal)
-   }
-    }
-      
-    return (
-      <div className="App">
-        <header>
-          <h1>My Todo List</h1>
-        </header>
-        <Form todo={todo} setTodo={setTodo} inputText = {inputText} setInputText ={setInputText} setStatus={setStatus}/>
-        <Todolist todo={todo} setTodo={setTodo} inputText = {inputText} filteredTodos={filteredTodos}/>
-      </div>
-    );
   }
-
+  return (  
+    <div className="app-div">
+      <h1>Welcome to My Movie Database App</h1>
+      <div>
+      <Search movieTitle = {title} setMovieTitle={setMovieTitle} movieInfo ={movieInfo} setMovieInfo = {setMovieInfo}/>
+      </div>
+    </div>
+  );
+}
+ 
 export default App;
